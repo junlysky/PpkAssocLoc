@@ -1,13 +1,12 @@
-# PpkAssocLoc
+# PAD
 
-Package for processing raw continuous waveform. <br>
+Package for detecting earthquakes from raw continuous waveform. <br>
 <br>
 procudures include: <br>
 (1) phase picking <br>
-(2) associate picks to events <br>
-(3) locate events and estimate magnitude. <br>
+(2) phase association <br>
 <br>
-Each of the three procedures are implemented in seperate scripts, i.e. the 'pickers.py', 'associators.py' and 'locators.py'. An example for combining these processes are shown in 'mkctlg.py', which aims to get an earthquake catalog directly from raw waveforms. 'parallel.py' are also provided for parallel computing.
+Both procedures are implemented in seperate scripts, i.e. the 'pickers.py' and 'associators.py'. An example for combining these two processes for earthquake detection are shown in 'run_ppk_assoc.py'. 'parallel_ppk_assoc.py' are also provided for parallel computing.
 <br>
   
 * phase pickers  
@@ -16,28 +15,18 @@ Each of the three procedures are implemented in seperate scripts, i.e. the 'pick
 # use picker
 # 1. waveform --> picks
 import pickers
-picker = pivkers.Trad_PS()
+picker = pickers.Trad_PS()
 picks = picker.pick(stream) # input obspy.stream
 ```
   
-* picks associators  
-*associators.py* defines various methods to associate phase picks to picks of different events.
+* phase associators  
+*associators.py* defines various phase associate methods.
 ```python
 # use associator
-# 2. associate: picks --> events
+# 2. associate by original time (ot) cluster: picks --> events
 event_picks = associator.pick2event(picks)
-# write pahse file
-associator.write(event_picks, out_pha)
-```
-  
-* earthquake locators  
-*locators.py* defines various earthquake locate methods.
-```python
-# use locator
-# 3. locate evnets
-event_loc = locator.locate(event_pick)
+# 3. associate by spatial seach: location of P travel time cluster
+event_loc, event_pick = associator.locate(event_pick)
 # 4. estimate magnitude
-event_loc_mag = locator.calc_mag(event_pick, event_loc)
-# write catalog
-locator.write(event_loc_mag, out_file)
+event_loc_mag = associator.calc_mag(event_pick, event_loc)
 ```
